@@ -2,14 +2,13 @@
 #include <QFile>
 #include <QDebug>
 #include <QTextStream>
-#include <QRegularExpression>
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    // 打开输入文件 "qt.xml"
-    QFile inputFile("qt.xml");
+    // 打开输入文件 "qt1.xml"
+    QFile inputFile("qt1.xml");
     if (!inputFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         qDebug() << "Failed to open the XML file: " << inputFile.errorString();
@@ -31,14 +30,13 @@ int main(int argc, char *argv[])
     replacements["$VALUE4"] = "李四";
     replacements["$VALUE5"] = "合格";
 
-    // 循环执行替换操作
+    // 逐个替换每个需要中文替换的位置
     QMapIterator<QString, QString> it(replacements);
     while (it.hasNext()) {
         it.next();
         QString key = it.key();
         QString value = it.value();
-        QRegularExpression regex(QString::fromLatin1("\\Q") + key + QString::fromLatin1("\\E"));
-        strAllContent.replace(regex, value);
+        strAllContent.replace(key, value);
     }
 
     // 打开输出文件 "export.docx"
