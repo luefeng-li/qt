@@ -1,0 +1,61 @@
+#include <QCoreApplication>
+#include <QFile>
+#include <QDebug>
+#include <QTextStream>
+#include <QRegularExpression>
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+
+    // 打开输入文件 "qt.xml"
+    QFile inputFile("qt.xml");
+    if (!inputFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Failed to open the XML file: " << inputFile.errorString();
+        return 1;
+    }
+
+    // 读取输入文件内容
+    QTextStream inStream(&inputFile);
+    inStream.setCodec("UTF-8"); // 设置文件编码为UTF-8
+    QString strAllContent = inStream.readAll();
+    inputFile.close();
+
+    // 创建要替换的映射
+    QMap<QString, QString> replacements;
+    replacements["$VALUE0"] = "1";
+    replacements["$VALUE1"] = "法外狂徒张三";
+    replacements["$VALUE2"] = "考试不合格";
+    replacements["$VALUE3"] = "2";
+    replacements["$VALUE4"] = "李四";
+    replacements["$VALUE5"] = "合格";
+
+    // 循环执行替换操作
+    QMapIterator<QString, QString> it(replacements);
+    while (it.hasNext()) {
+        it.next();
+        QString key = it.key();
+        QString value = it.value();
+        QRegularExpression regex(QString::fromLatin1("\\Q") + key + QString::fromLatin1("\\E"));
+        strAllContent.replace(regex, value);
+    }
+
+    // 打开输出文件 "export.docx"
+    QFile outputFile("export.doc");
+    if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        qDebug() << "Failed to open the output file: " << outputFile.errorString();
+        return 1;
+    }
+
+    // 创建输出文档流
+    QTextStream outStream(&outputFile);
+    outStream.setCodec("UTF-8");  // 设置输出文件编码为UTF-8
+    outStream << strAllContent;
+    outputFile.close();
+
+    qDebug() << "Replacement complete. Output file saved as export.docx";
+
+    return 0;
+}
